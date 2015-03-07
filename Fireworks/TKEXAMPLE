@@ -1,0 +1,90 @@
+from Tkinter import *
+from threading import Timer
+import time
+
+root = Tk()
+
+#Our main canvas. I'm not actually sure how to set this up properly, but I'm not primarily concerned with that right now.
+canvas = Canvas(width=600, height=800, bg='white')  
+canvas.pack(expand=YES, fill=BOTH)
+
+#This entry field will allow a user to enter a BPM. This may be handled by a rhythm detection function and fed here.
+bpmEntry = Entry(canvas)
+bpmEntry.pack()
+bpmEntry.insert(0, "140")
+
+#This label will say Boots. Sometimes.
+bootsText = StringVar()
+bootsLabel = Label(canvas, textvariable=bootsText)
+bootsLabel.pack()
+
+#This label will say Cats! Sometimes.
+catsText = StringVar()
+catsLabel = Label(canvas, textvariable=catsText)
+catsLabel.pack()
+
+
+class BeatBox:
+    """BeatBox. Counts to the number you told it to!"""
+    def __init__(self, ts):
+        self.time = ts
+        self.beat = 1
+
+    def tick(self):
+        self.beat+=1
+        if self.beat >= (1+self.time):
+            self.beat = 1
+
+#This beatbox is going to help us count to four.
+beatbox = BeatBox(4)
+
+
+#This happens every beat. I feel like it needs to be cleaned up in a few places
+def pulse():
+
+    #This assignment probably doesn't need to happen every time. But, otherwise it complains about the variable not being declared yet the first time.
+    #If you know how to clean this up, let me know!
+    BPM = 30
+
+    #Before getting the value, we have to make sure there is something. Just in case.
+    if bpmEntry.get():
+        BPM = float(bpmEntry.get())
+
+
+    #A really low BPM could leave us waiting a long time for the rhythm to start again.
+    if BPM < 30:
+        BPM = 30
+        print "(*30)"
+
+    beatbox.tick()
+
+    if beatbox.beat == 3:
+        bootsText.set("      ")
+        catsText.set("Cats!")
+
+    if beatbox.beat == 1:
+        bootsText.set("Boots")
+        catsText.set("     ")
+
+
+    #It keeps going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going and going
+    BPS = BPM / 60.0
+    t = Timer(1/BPS, pulse)
+    t.start()
+
+    
+    #This is a space for status reporting.
+    print "  --  --  "
+    print BPM
+    print beatbox.beat
+    print "Oonce"
+
+    x = root.winfo_pointerx()
+    y = root.winfo_pointery()
+    print x,y
+
+#Alright. Let's get that engine revving!
+pulse()
+
+#I guess this is a tkinter thing? Not clear on it yet.
+root.mainloop() 
